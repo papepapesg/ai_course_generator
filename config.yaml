@@ -1,12 +1,12 @@
 groq:
-  api_key: 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
-  model: mixtral-8x7b-32768
-  system_prompt: You are a knowledgeable expert and educator. Your task is to create comprehensive, well-structured educational content in professional HTML email format.
+  api_key: ${GROQ_API_KEY}
+  model: ${GROQ_MODEL}
+  system_prompt: ${SYSTEM_PROMPT}
 
 email:
-  api_key: re_Fua1VjBd_CEDoMbg8or9QT9nnov5GmNED
-  from_email: onboarding@resend.dev
-  recipient_email: papepapes@gmail.com
+  api_key: ${RESEND_API_KEY}
+  from_email: ${FROM_EMAIL}
+  recipient_email: ${RECIPIENT_EMAIL}
   subject_prefix: AI Course Generator
 
 output:

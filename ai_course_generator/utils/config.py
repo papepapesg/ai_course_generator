@@ -4,6 +4,27 @@ import os
 import yaml
 from pathlib import Path
 from typing import Dict, Any
+import re
+
+def _replace_env_vars(config: Dict[str, Any]) -> Dict[str, Any]:
+    """Replace environment variable placeholders in config values."""
+    def _replace_value(value):
+        if isinstance(value, str):
+            # Find all ${VAR} patterns
+            env_vars = re.findall(r'\${([^}]+)}', value)
+            for var in env_vars:
+                env_value = os.getenv(var)
+                if env_value is None:
+                    raise ValueError(f"Environment variable {var} not set")
+                value = value.replace(f"${{{var}}}", env_value)
+            return value
+        elif isinstance(value, dict):
+            return {k: _replace_value(v) for k, v in value.items()}
+        elif isinstance(value, list):
+            return [_replace_value(item) for item in value]
+        return value
+
+    return _replace_value(config)
 
 def load_config() -> Dict[str, Any]:
     """Load configuration from YAML file and environment variables."""
@@ -13,6 +34,9 @@ def load_config() -> Dict[str, Any]:
     
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
+    
+    # Replace environment variables in config
+    config = _replace_env_vars(config)
     
     # Override with environment variables if they exist
     if os.getenv("GROQ_API_KEY"):
